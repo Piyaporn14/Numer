@@ -56,8 +56,8 @@ export default class Test extends Component {
   //API
   async Ex() {
     // const url = "https://api.randomuser.me/";
-    const url = "http://192.168.102.128:8000/Spline";
-    // const url = "http://192.168.102.128:8000/Newton";
+    const url = "http://localhost:8000/Spline";
+    // const url = "http://localhost:8000/Newton";
     // const url = "http://127.0.0.1/Json/item.json";
     const response = await fetch(url);
     console.log(response);
@@ -279,7 +279,9 @@ export default class Test extends Component {
               <p>Number of points (n)</p>
               <Input
                 onChange={async (e) => {
-                  await this.setState({ nPoints: e.target.value });
+                  await this.setState({
+                    nPoints: e.target.value,
+                  });
                   this.createTableInput(parseInt(this.state.nPoints));
                   this.forceUpdate();
                 }}
@@ -299,14 +301,12 @@ export default class Test extends Component {
               />
               <br></br>
               <br></br>
-              <Button onClick={this.bi} type="primary">
-                Submit
-              </Button>
+              <Button onClick={this.bi}>Submit</Button>
               <Button
                 style={{
                   marginLeft: "73%",
-                  backgroundColor: "#76D7C4",
-                  borderColor: "#76D7C4",
+                  backgroundColor: "#F0B27A",
+                  borderColor: "#F0B27A",
                 }}
                 onClick={this.Ex}
                 type="primary"
@@ -343,7 +343,7 @@ export default class Test extends Component {
           bordered={true}
           style={{
             width: "100%",
-            background: "#2196f3",
+            background: "#F0B27A",
             color: "#FFFFFFFF",
           }}
           id="outputCard"

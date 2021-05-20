@@ -38,7 +38,7 @@ export default class Test extends Component {
   //API
   async Ex() {
     // const url = "https://api.randomuser.me/";
-    const url = "http://192.168.102.128:8000/Gauss_Jordan";
+    const url = "http://localhost:8000/Gauss_Jordan";
     // const url = "http://127.0.0.1/Json/item.json";
     const response = await fetch(url);
     console.log(response);
@@ -57,10 +57,6 @@ export default class Test extends Component {
           data.Gauss_Jordan.B[i][0];
       }
     }
-  }
-
-  componentDidMount() {
-    //ทำอัตโนมัติหลังจาก render เสร็จ
   }
 
   initMatrix() {
@@ -200,7 +196,9 @@ export default class Test extends Component {
               <p>Dimension</p>
               <Input
                 onChange={async (e) => {
-                  await this.setState({ Dimension: e.target.value });
+                  await this.setState({
+                    Dimension: e.target.value,
+                  });
                   this.createMatrix(this.state.Dimension, this.state.Dimension);
                   this.forceUpdate();
                   //   console.log(this.state.Dimension);
@@ -211,14 +209,12 @@ export default class Test extends Component {
               />
               <br></br>
               <br></br>
-              <Button onClick={this.bi} type="primary">
-                Submit
-              </Button>
+              <Button onClick={this.bi}>Submit</Button>
               <Button
                 style={{
                   marginLeft: "50%",
-                  backgroundColor: "#76D7C4",
-                  borderColor: "#76D7C4",
+                  backgroundColor: "#F0B27A",
+                  borderColor: "#F0B27A",
                 }}
                 onClick={this.Ex}
                 type="primary"
@@ -263,7 +259,7 @@ export default class Test extends Component {
           bordered={true}
           style={{
             width: "100%",
-            background: "#2196f3",
+            background: "#F0B27A",
             color: "#FFFFFFFF",
           }}
           id="outputCard"

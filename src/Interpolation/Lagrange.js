@@ -1,26 +1,17 @@
 import React, { Component } from "react";
 import "antd/dist/antd.css";
 import { Card, Input, Button, Table } from "antd";
-import Desmos from "desmos";
-import { addStyles, EditableMathField } from "react-mathquill";
-
-import * as am4core from "@amcharts/amcharts4/core";
-import "../components/Graph.css";
-import "@amcharts/amcharts4/charts";
-am4core.options.autoSetClassName = true;
-
-const AlgebraLatex = require("algebra-latex");
-const math = require("mathjs");
+import { addStyles } from "react-mathquill";
 
 addStyles();
 
 var dataInTable = [];
 var columns2 = [
-  // {
-  //   title: "Ans",
-  //   dataIndex: "Ans",
-  //   key: "Ans",
-  // },
+  {
+    title: "Ans",
+    dataIndex: "Ans",
+    key: "Ans",
+  },
 ];
 
 var columns1 = [
@@ -45,8 +36,7 @@ var x = [],
   tableTag = [],
   interpolatePoint = [],
   tempTag = [],
-  fx,
-  tag;
+  fx;
 
 export default class Test extends Component {
   constructor(props) {
@@ -66,11 +56,12 @@ export default class Test extends Component {
     this.calculator = {};
     this.plot = [];
   }
+
   //API
   async Ex() {
     // const url = "https://api.randomuser.me/";
-    const url = "http://192.168.102.128:8000/Newton";
-    // const url = "http://192.168.102.128:8000/Newton";
+    const url = "http://localhost:8000/Newton";
+    // const url = "http://localhost:8000/Newton";
     // const url = "http://127.0.0.1/Json/item.json";
     const response = await fetch(url);
     console.log(response);
@@ -90,108 +81,10 @@ export default class Test extends Component {
     }
 
     this.createInterpolatePointInput();
-    for (var i = 0; i < this.state.interpolatePoint; i++) {
+    for (i = 0; i < this.state.interpolatePoint; i++) {
       document.getElementById("p" + (i + 1)).value = data.Newton.p[i];
     }
-    this.initialValue();
     this.forceUpdate();
-  }
-
-  componentDidMount() {
-    const data = this.state.rows;
-    console.log("data", data);
-    const chartConfiguration = {
-      type: "XYChart",
-      data: data,
-      xAxes: [
-        {
-          type: "ValueAxis",
-        },
-      ],
-      yAxes: [
-        {
-          type: "ValueAxis",
-        },
-      ],
-      series: [
-        {
-          type: "LineSeries",
-          dataFields: {
-            valueX: "x",
-            valueY: "y",
-          },
-          groupFields: {
-            valueY: "average",
-          },
-        },
-      ],
-    };
-    console.log(data);
-    this.chart = am4core.createFromConfig(
-      JSON.parse(JSON.stringify(chartConfiguration)),
-      "chartdiv"
-    );
-    console.log("Dis");
-  }
-
-  componentDidUpdate() {
-    const data = this.state.rows;
-    console.log("data", data);
-    const chartConfiguration = {
-      type: "XYChart",
-      data: data,
-      xAxes: [
-        {
-          type: "ValueAxis",
-        },
-      ],
-      yAxes: [
-        {
-          type: "ValueAxis",
-        },
-      ],
-      series: [
-        {
-          type: "LineSeries",
-          dataFields: {
-            valueX: "x",
-            valueY: "y",
-          },
-          groupFields: {
-            valueY: "average",
-          },
-        },
-      ],
-    };
-    console.log(data);
-    this.chart = am4core.createFromConfig(
-      JSON.parse(JSON.stringify(chartConfiguration)),
-      "chartdiv"
-    );
-    console.log("UP");
-  }
-
-  componentWillUnmount() {
-    if (this.chart) {
-      this.chart.dispose();
-    }
-    this.forceUpdate();
-    console.log("will");
-  }
-
-  initialSchema(n) {
-    for (var i = 0; i < n; i++) {
-      columns2.push({
-        title: "L" + i,
-        dataIndex: "l" + i,
-        key: "l" + i,
-      });
-    }
-    columns2.push({
-      title: "Ans",
-      dataIndex: "Ans",
-      key: "Ans",
-    });
   }
 
   initialValue() {
@@ -204,11 +97,6 @@ export default class Test extends Component {
     for (i = 1; i <= this.state.interpolatePoint; i++) {
       interpolatePoint[i] = parseInt(document.getElementById("p" + i).value);
     }
-    //loop set ค่า plot
-    for (var i = 0; i < x.length - 1; i++) {
-      this.plot[i] = { x: x[i + 1], y: y[i + 1] };
-    }
-    this.setState({ rows: this.plot });
     console.log("initialValue");
   }
 
@@ -228,36 +116,30 @@ export default class Test extends Component {
   lagrange(n, X) {
     fx = 0;
     this.initialValue();
-    tag = "";
-    tag = "{";
-    console.log("lagrange1");
-    for (var i = 1; i <= n; i++) {
-      var ln = this.L(X, i, n);
-
-      tag += '"l' + (i - 1) + '": ' + ln;
-      tag += ",";
-
-      fx += ln * y[i];
+    //loop set ค่า plot
+    for (var i = 0; i < x.length - 1; i++) {
+      this.plot[i] = { x: x[i + 1], y: y[i + 1] };
     }
-    console.log("tag", tag);
-
+    for (var i = 1; i <= n; i++) {
+      fx += this.L(X, i, n) * y[i];
+    }
     this.setState({
       showOutputCard: true,
     });
   }
 
   bi() {
-    this.initialSchema(this.state.interpolatePoint);
+    this.setState({ rows: this.plot });
+    console.log(this.state.rows);
     this.lagrange(
       parseInt(this.state.interpolatePoint),
       parseFloat(this.state.X)
     );
+    dataInTable = [];
+    dataInTable.push({
+      Ans: fx,
+    });
 
-    tag += '"Ans":' + fx + "}";
-    console.log("tag", tag);
-    dataInTable.push(JSON.parse(tag));
-    console.log("lagrange2");
-    console.log(dataInTable);
     console.log(fx);
     console.log("end");
     this.forceUpdate();
@@ -323,10 +205,6 @@ export default class Test extends Component {
             fontSize: "18px",
             fontWeight: "bold",
           }}
-          onChange={async (e) => {
-            this.initialValue();
-            this.forceUpdate();
-          }}
           id={"y" + i}
           key={"y" + i}
           placeholder={"y" + i}
@@ -338,7 +216,6 @@ export default class Test extends Component {
         y: y[i - 1],
       });
     }
-
     this.setState({
       showTableInput: true,
     });
@@ -349,17 +226,15 @@ export default class Test extends Component {
     return (
       <div>
         <h1>Lagrange</h1>
-        <div id="chartdiv">
-          {console.log("rows", this.state.rows)}
-          {/* <Graph data={this.state.rows} /> */}
-        </div>
         <div className="row">
           <div className="col">
             <div>
               <p>Number of points (n)</p>
               <Input
                 onChange={async (e) => {
-                  await this.setState({ nPoints: e.target.value });
+                  await this.setState({
+                    nPoints: e.target.value,
+                  });
                   this.createTableInput(parseInt(this.state.nPoints));
                   this.forceUpdate();
                 }}
@@ -380,7 +255,9 @@ export default class Test extends Component {
               <p>interpolatePoint</p>
               <Input
                 onChange={async (e) => {
-                  await this.setState({ interpolatePoint: e.target.value });
+                  await this.setState({
+                    interpolatePoint: e.target.value,
+                  });
                   this.createInterpolatePointInput();
                   this.forceUpdate();
                 }}
@@ -390,14 +267,12 @@ export default class Test extends Component {
               />
               <br></br>
               <br></br>
-              <Button onClick={this.bi} type="primary">
-                Submit
-              </Button>
+              <Button onClick={this.bi}>Submit</Button>
               <Button
                 style={{
                   marginLeft: "73%",
-                  backgroundColor: "#76D7C4",
-                  borderColor: "#76D7C4",
+                  backgroundColor: "#F0B27A",
+                  borderColor: "#F0B27A",
                 }}
                 onClick={this.Ex}
                 type="primary"
@@ -441,31 +316,30 @@ export default class Test extends Component {
             {tempTag}
           </div>
         )}
-        {this.state.showOutputCard && (
-          <Card
-            title={"Output"}
+
+        <Card
+          title={"Output"}
+          bordered={true}
+          style={{
+            width: "100%",
+            background: "#F0B27A",
+            color: "#FFFFFFFF",
+          }}
+          id="outputCard"
+        >
+          <Table
+            pagination={{ defaultPageSize: 5 }}
+            columns={columns2}
+            dataSource={dataInTable}
+            pagination={false}
             bordered={true}
-            style={{
-              width: "100%",
-              background: "#2196f3",
-              color: "#FFFFFFFF",
+            bodyStyle={{
+              fontWeight: "bold",
+              fontSize: "18px",
+              color: "black",
             }}
-            id="outputCard"
-          >
-            <Table
-              pagination={{ defaultPageSize: 5 }}
-              columns={columns2}
-              dataSource={dataInTable}
-              pagination={false}
-              bordered={true}
-              bodyStyle={{
-                fontWeight: "bold",
-                fontSize: "18px",
-                color: "black",
-              }}
-            ></Table>
-          </Card>
-        )}
+          ></Table>
+        </Card>
       </div>
     );
   }

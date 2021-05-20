@@ -10,7 +10,6 @@ const math = require("mathjs");
 addStyles();
 
 var dataInTable = [];
-var ansp = null;
 const columns = [
   {
     title: "Iteration",
@@ -40,10 +39,9 @@ export default class Test extends Component {
     this.calculator = {};
   }
 
-  //API
   async Ex() {
     // const url = "https://api.randomuser.me/";
-    const url = "http://192.168.102.128:8000/Secant";
+    const url = "http://localhost:8000/Secant";
     // const url = "http://127.0.0.1/Json/item.json";
     const response = await fetch(url);
     console.log(response);
@@ -57,68 +55,19 @@ export default class Test extends Component {
     console.log(this.state.X0);
   }
 
-  componentDidMount() {
-    //ทำอัตโนมัติหลังจาก render เสร็จ
-    console.log(this.state.Funtion);
-    console.log(this);
-    this.elt = document.getElementById("calculator");
-    this.calculator = Desmos.GraphingCalculator(this.elt, {
-      expressions: false,
-      backgroundColor: "#F4F6F7",
-      textColor: "#C70039",
-    });
-    this.calculator.setExpression({ id: "graph1", latex: this.state.Funtion });
-    // this.bi();
-    document.getElementsByClassName(
-      "dcg-graphpaper-branding"
-    )[0].style.display = "none";
-  }
-  componentDidUpdate() {
-    this.calculator.destroy();
-    this.elt = document.getElementById("calculator");
-    this.calculator = Desmos.GraphingCalculator(this.elt, {
-      expressions: false,
-      backgroundColor: "#F4F6F7",
-      textColor: "#C70039",
-    });
-    this.calculator.setExpression({ id: "graph1", latex: this.state.Funtion });
-    // this.calculator.setExpression({
-    //   id: "line1",
-    //   latex: "x=" + this.state.X0,
-    //   lineStyle: Desmos.Styles.DASHED,
-    // });
-    this.calculator.setExpression({
-      label: "(" + ansp + ",0)",
-      id: "ANS",
-      latex: "(" + ansp + ",0)",
-      lineStyle: Desmos.Styles.DASHED,
-      showLabel: true,
-      color: this.calculator.colors.BLACK,
-    });
-    console.log(this.calculator);
-    document.getElementsByClassName(
-      "dcg-graphpaper-branding"
-    )[0].style.display = "none";
-  }
-
   fn(x) {
-    const algebraObj = new AlgebraLatex()
-      .parseLatex(this.state.Funtion)
-      .toMath();
-    console.log(math.evaluate(algebraObj, { x: x }));
-    return math.evaluate(algebraObj, { x: x });
-    // console.log(math.evaluate(this.state.Funtion, { x: x }));
-    // return math.evaluate(this.state.Funtion, { x: x });
+    return math.evaluate(this.state.Funtion, { x: x });
   }
 
   error(xnew, xold) {
     return Math.abs((xnew - xold) / xnew);
   }
+
   func(Funtion, x) {
-    console.log(this);
-    const algebraObj = new AlgebraLatex().parseLatex(Funtion).toMath();
-    console.log(math.evaluate(algebraObj, { x: x }));
-    return math.evaluate(algebraObj, { x: x });
+    //console.log(this)
+    //const algebraObj = new AlgebraLatex().parseLatex(Funtion).toMath()
+    // console.log(math.evaluate(algebraObj, { x: x }))
+    return math.evaluate(Funtion, { x: x });
   }
 
   bi() {
@@ -147,7 +96,6 @@ export default class Test extends Component {
       x.push(y);
       epsilon = error(y, x[i]);
       data["y"][n] = y.toFixed(8);
-      ansp = y.toFixed(6);
       data["error"][n] = Math.abs(epsilon).toFixed(8);
       n++;
       i++;
@@ -156,7 +104,6 @@ export default class Test extends Component {
       }
     } while (Math.abs(epsilon) > 0.000001);
     this.createTable(data["y"], data["error"]);
-    this.forceUpdate();
   }
 
   createTable(y, error) {
@@ -168,6 +115,7 @@ export default class Test extends Component {
         error: error[i],
       });
     }
+    this.forceUpdate();
   }
 
   render() {
@@ -190,14 +138,6 @@ export default class Test extends Component {
               />
               <br></br>
               <br></br>
-              <EditableMathField
-                style={{ display: "block" }}
-                latex={this.state.Funtion}
-                onChange={(mathField) => {
-                  this.setState({ Funtion: mathField.latex() });
-                }}
-              />
-              <p>X0</p>
               <Input
                 onChange={(e) => {
                   this.setState({ X0: e.target.value });
@@ -207,7 +147,8 @@ export default class Test extends Component {
                 name="X0"
                 placeholder="X0"
               />
-              <p>X1</p>
+              <br></br>
+              <br></br>
               <Input
                 onChange={(e) => {
                   this.setState({ X1: e.target.value });
@@ -219,14 +160,12 @@ export default class Test extends Component {
               />
               <br></br>
               <br></br>
-              <Button onClick={this.bi} type="primary">
-                Submit
-              </Button>
+              <Button onClick={this.bi}>Submit</Button>
               <Button
                 style={{
-                  marginLeft: "73%",
-                  backgroundColor: "#76D7C4",
-                  borderColor: "#76D7C4",
+                  marginLeft: "70%",
+                  backgroundColor: "#F0B27A",
+                  borderColor: "#F0B27A",
                 }}
                 onClick={this.Ex}
                 type="primary"
@@ -235,15 +174,6 @@ export default class Test extends Component {
               </Button>
             </div>
             <br></br>
-          </div>
-          <div className="col">
-            <div
-              id="calculator"
-              style={{
-                width: "600px",
-                height: "400px",
-              }}
-            ></div>
           </div>
         </div>
         <br></br>
@@ -260,7 +190,7 @@ export default class Test extends Component {
           bordered={true}
           style={{
             width: "100%",
-            background: "#2196f3",
+            background: "#F0B27A",
             color: "#FFFFFFFF",
           }}
           id="outputCard"
